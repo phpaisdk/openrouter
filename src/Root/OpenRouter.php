@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace AiSdk;
 
+use AiSdk\Contracts\ImageModelInterface;
 use AiSdk\Contracts\TextModelInterface;
 use AiSdk\OpenRouter\OpenRouterOptions;
 use AiSdk\OpenRouter\OpenRouterProvider;
@@ -36,5 +37,10 @@ final class OpenRouter
     public static function model(string $modelId): TextModelInterface
     {
         return self::default()->textModel($modelId);
+    }
+
+    public static function image(string $modelId): ImageModelInterface
+    {
+        return self::default()->imageModel($modelId);
     }
 }

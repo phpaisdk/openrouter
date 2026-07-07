@@ -57,9 +57,44 @@ it('generates text end to end through the OpenRouter vertical', function () {
         ->and($client->lastRequest->getHeaderLine('HTTP-Referer'))->toBe('https://example.com');
 });
 
+it('generates images through the OpenRouter vertical', function () {
+    $client = new FakeHttpClient(200, json_encode([
+        'created' => 1710000000,
+        'data' => [['b64_json' => base64_encode('<svg></svg>'), 'media_type' => 'image/svg+xml']],
+        'usage' => ['prompt_tokens' => 6, 'completion_tokens' => 8, 'total_tokens' => 14],
+    ]));
+    configureOpenRouterWith($client);
+
+    OpenRouter::create(['apiKey' => 'or-test']);
+
+    $result = Generate::image()
+        ->model(OpenRouter::image('recraft/recraft-v4.1-vector'))
+        ->prompt('A vector bird')
+        ->count(1)
+        ->aspectRatio('1:1')
+        ->providerOptions('openrouter', ['raw' => ['provider' => ['options' => ['recraft' => ['style' => 'vector']]]]])
+        ->run();
+
+    expect($result->output->base64)->toBe(base64_encode('<svg></svg>'))
+        ->and($result->output->mimeType)->toBe('image/svg+xml')
+        ->and($result->usage->totalTokens)->toBe(14);
+
+    $body = $client->sentBody();
+    expect($body['model'])->toBe('recraft/recraft-v4.1-vector')
+        ->and($body['prompt'])->toBe('A vector bird')
+        ->and($body['n'])->toBe(1)
+        ->and($body['aspect_ratio'])->toBe('1:1')
+        ->and($body['provider']['options']['recraft']['style'])->toBe('vector')
+        ->and($body)->not->toHaveKey('response_format');
+
+    expect($client->lastRequest->getUri()->getPath())->toBe('/api/v1/images')
+        ->and($client->lastRequest->getHeaderLine('Authorization'))->toBe('Bearer or-test');
+});
+
 it('loads routed model capabilities from resources models json', function () {
     OpenRouter::create(['apiKey' => 'or-test']);
 
     expect(OpenRouter::model('anthropic/claude-sonnet-4')->supports(Capability::Reasoning))->toBeTrue()
-        ->and(OpenRouter::model('x-ai/grok-4.3')->supports(Capability::ImageInput))->toBeTrue();
+        ->and(OpenRouter::model('x-ai/grok-4.3')->supports(Capability::ImageInput))->toBeTrue()
+        ->and(OpenRouter::image('x-ai/grok-imagine-image-quality')->supports(Capability::ImageGeneration))->toBeTrue();
 });
