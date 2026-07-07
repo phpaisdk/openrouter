@@ -57,6 +57,22 @@ it('generates text end to end through the OpenRouter vertical', function () {
         ->and($client->lastRequest->getHeaderLine('HTTP-Referer'))->toBe('https://example.com');
 });
 
+it('normalizes provider-neutral text usage fields', function () {
+    $client = new FakeHttpClient(200, json_encode([
+        'choices' => [['index' => 0, 'message' => ['content' => 'Hello from OpenRouter'], 'finish_reason' => 'stop']],
+        'usage' => ['input_tokens' => 11, 'output_tokens' => 5, 'total_tokens' => 16],
+    ]));
+    configureOpenRouterWith($client);
+
+    OpenRouter::create(['apiKey' => 'or-test']);
+
+    $result = Generate::text('Hi')->model(OpenRouter::model('openai/gpt-4o'))->run();
+
+    expect($result->usage->inputTokens)->toBe(11)
+        ->and($result->usage->outputTokens)->toBe(5)
+        ->and($result->usage->totalTokens)->toBe(16);
+});
+
 it('generates images through the OpenRouter vertical', function () {
     $client = new FakeHttpClient(200, json_encode([
         'created' => 1710000000,
