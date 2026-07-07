@@ -23,6 +23,21 @@ $result = Generate::text()
 echo $result->text;
 ```
 
+## Image Generation
+
+```php
+use AiSdk\Generate;
+use AiSdk\OpenRouter;
+
+$result = Generate::image()
+    ->model(OpenRouter::image('openai/gpt-image-1'))
+    ->prompt('A clean app icon for a PHP AI SDK')
+    ->size('1024x1024')
+    ->run();
+
+$result->output->save(__DIR__.'/icon.png');
+```
+
 ## Configuration
 
 | Variable | Description | Default |
