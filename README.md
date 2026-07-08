@@ -38,6 +38,22 @@ $result = Generate::image()
 $result->output->save(__DIR__.'/icon.png');
 ```
 
+## Speech Generation
+
+```php
+use AiSdk\Generate;
+use AiSdk\OpenRouter;
+
+$result = Generate::speech()
+    ->model(OpenRouter::speech('microsoft/mai-voice-2'))
+    ->input('Welcome to the release.')
+    ->voice('en-US-Harper:MAI-Voice-2')
+    ->format('mp3')
+    ->run();
+
+$result->output->save(__DIR__.'/speech.mp3');
+```
+
 ## Configuration
 
 | Variable | Description | Default |

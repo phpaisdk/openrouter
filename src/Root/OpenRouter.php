@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace AiSdk;
 
 use AiSdk\Contracts\ImageModelInterface;
+use AiSdk\Contracts\SpeechModelInterface;
 use AiSdk\Contracts\TextModelInterface;
 use AiSdk\OpenRouter\OpenRouterOptions;
 use AiSdk\OpenRouter\OpenRouterProvider;
@@ -42,5 +43,10 @@ final class OpenRouter
     public static function image(string $modelId): ImageModelInterface
     {
         return self::default()->imageModel($modelId);
+    }
+
+    public static function speech(string $modelId): SpeechModelInterface
+    {
+        return self::default()->speechModel($modelId);
     }
 }

@@ -107,10 +107,43 @@ it('generates images through the OpenRouter vertical', function () {
         ->and($client->lastRequest->getHeaderLine('Authorization'))->toBe('Bearer or-test');
 });
 
+it('generates speech through the OpenRouter vertical', function () {
+    $client = new FakeHttpClient(200, 'audio-bytes', 'audio/pcm');
+    configureOpenRouterWith($client);
+
+    OpenRouter::create(['apiKey' => 'or-test']);
+
+    $result = Generate::speech()
+        ->model(OpenRouter::speech('microsoft/mai-voice-2'))
+        ->input('Welcome to the release.')
+        ->voice('en-US-Harper:MAI-Voice-2')
+        ->format('pcm')
+        ->providerOptions('openrouter', ['raw' => ['speed' => 1.2]])
+        ->run();
+
+    expect($result->output->data)->toBe('audio-bytes')
+        ->and($result->output->mimeType)->toBe('audio/pcm')
+        ->and($result->providerMetadata['openrouter']['model'])->toBe('microsoft/mai-voice-2');
+
+    $body = $client->sentBody();
+    expect($body)->toMatchArray([
+        'model' => 'microsoft/mai-voice-2',
+        'input' => 'Welcome to the release.',
+        'voice' => 'en-US-Harper:MAI-Voice-2',
+        'response_format' => 'pcm',
+        'speed' => 1.2,
+    ]);
+
+    expect($client->lastRequest->getUri()->getPath())->toBe('/api/v1/audio/speech')
+        ->and($client->lastRequest->getHeaderLine('Accept'))->toBe('audio/pcm')
+        ->and($client->lastRequest->getHeaderLine('Authorization'))->toBe('Bearer or-test');
+});
+
 it('loads routed model capabilities from resources models json', function () {
     OpenRouter::create(['apiKey' => 'or-test']);
 
     expect(OpenRouter::model('anthropic/claude-sonnet-4')->supports(Capability::Reasoning))->toBeTrue()
         ->and(OpenRouter::model('x-ai/grok-4.3')->supports(Capability::ImageInput))->toBeTrue()
-        ->and(OpenRouter::image('x-ai/grok-imagine-image-quality')->supports(Capability::ImageGeneration))->toBeTrue();
+        ->and(OpenRouter::image('x-ai/grok-imagine-image-quality')->supports(Capability::ImageGeneration))->toBeTrue()
+        ->and(OpenRouter::speech('microsoft/mai-voice-2')->supports(Capability::SpeechGeneration))->toBeTrue();
 });

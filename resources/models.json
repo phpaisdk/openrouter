@@ -2,6 +2,42 @@
   "provider": "openrouter",
   "models": [
     {
+      "id": "openai/gpt-4o-mini-tts-2025-12-15",
+      "lab": "openai",
+      "status": "stable",
+      "modalities": [
+        "audio"
+      ],
+      "capabilities": [
+        "speech_generation",
+        "text_input"
+      ]
+    },
+    {
+      "id": "microsoft/mai-voice-2",
+      "lab": "microsoft",
+      "status": "stable",
+      "modalities": [
+        "audio"
+      ],
+      "capabilities": [
+        "speech_generation",
+        "text_input"
+      ]
+    },
+    {
+      "id": "x-ai/grok-voice-tts",
+      "lab": "xai",
+      "status": "stable",
+      "modalities": [
+        "audio"
+      ],
+      "capabilities": [
+        "speech_generation",
+        "text_input"
+      ]
+    },
+    {
       "id": "google/gemini-3.1-flash-lite-image",
       "lab": "google",
       "status": "stable",

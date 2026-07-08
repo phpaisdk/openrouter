@@ -6,8 +6,10 @@ namespace AiSdk\OpenRouter;
 
 use AiSdk\Contracts\BaseProvider;
 use AiSdk\Contracts\ImageModelInterface;
+use AiSdk\Contracts\SpeechModelInterface;
 use AiSdk\Contracts\TextModelInterface;
 use AiSdk\OpenRouter\Models\OpenRouterImageModel;
+use AiSdk\OpenRouter\Models\OpenRouterSpeechModel;
 use AiSdk\OpenRouter\Models\OpenRouterTextModel;
 
 final class OpenRouterProvider extends BaseProvider
@@ -27,5 +29,10 @@ final class OpenRouterProvider extends BaseProvider
     public function imageModel(string $modelId): ImageModelInterface
     {
         return new OpenRouterImageModel($modelId, $this->options, $this->modelRegistry());
+    }
+
+    public function speechModel(string $modelId): SpeechModelInterface
+    {
+        return new OpenRouterSpeechModel($modelId, $this->options, $this->modelRegistry());
     }
 }
