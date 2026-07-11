@@ -138,10 +138,32 @@ it('generates speech through the OpenRouter vertical', function () {
         ->and($client->lastRequest->getHeaderLine('Authorization'))->toBe('Bearer or-test');
 });
 
+it('generates embeddings through the OpenRouter vertical', function () {
+    $client = new FakeHttpClient(200, json_encode([
+        'object' => 'list',
+        'model' => 'openai/text-embedding-3-small',
+        'data' => [['object' => 'embedding', 'index' => 0, 'embedding' => [0.1, 0.2]]],
+        'usage' => ['prompt_tokens' => 4, 'total_tokens' => 4],
+    ]));
+    configureOpenRouterWith($client);
+    OpenRouter::create(['apiKey' => 'or-test']);
+
+    $result = Generate::embedding('A document')
+        ->model(OpenRouter::embedding('openai/text-embedding-3-small'))
+        ->dimensions(256)
+        ->run();
+
+    expect($result->output->vector)->toBe([0.1, 0.2])
+        ->and($result->usage->inputTokens)->toBe(4)
+        ->and($client->sentBody()['dimensions'])->toBe(256)
+        ->and($client->lastRequest?->getUri()->getPath())->toBe('/api/v1/embeddings');
+});
+
 it('accepts opaque routed model ids for every implemented modality', function () {
     OpenRouter::create(['apiKey' => 'or-test']);
 
     expect(OpenRouter::model('vendor/future-text-model')->modelId())->toBe('vendor/future-text-model')
         ->and(OpenRouter::image('vendor/future-image-model')->modelId())->toBe('vendor/future-image-model')
-        ->and(OpenRouter::speech('vendor/future-speech-model')->modelId())->toBe('vendor/future-speech-model');
+        ->and(OpenRouter::speech('vendor/future-speech-model')->modelId())->toBe('vendor/future-speech-model')
+        ->and(OpenRouter::embedding('vendor/future-embedding-model')->modelId())->toBe('vendor/future-embedding-model');
 });

@@ -25,6 +25,23 @@ echo $result->text;
 
 Routed model IDs pass through unchanged and do not need to be registered. This package does not ship a model inventory; the SDK performs internal adapter validation before OpenRouter validates support for the selected route.
 
+## Embeddings
+
+```php
+use AiSdk\Generate;
+use AiSdk\OpenRouter;
+
+$result = Generate::embedding(['Search query', 'Document text'])
+    ->model(OpenRouter::embedding('openai/text-embedding-3-small'))
+    ->dimensions(256)
+    ->run();
+
+$queryVector = $result->embeddings[0]->vector;
+$documentVector = $result->embeddings[1]->vector;
+```
+
+OpenRouter embedding model IDs pass through unchanged. The v0.5 portable embedding API accepts text or a list of texts; provider-specific multimodal embedding inputs are outside this contract.
+
 ## Image Generation
 
 ```php
@@ -87,8 +104,22 @@ $result = Generate::text('Hello')
     ->run();
 ```
 
+Embedding-specific fields use the same provider namespace. For example, models that distinguish queries from documents can receive OpenRouter's documented `input_type` field:
+
+```php
+$result = Generate::embedding('Document text')
+    ->model(OpenRouter::embedding('provider/embedding-model'))
+    ->providerOptions('openrouter', ['input_type' => 'search_document'])
+    ->run();
+```
+
 ## Testing
 
 ```bash
 composer test
 ```
+
+## Links
+
+- [OpenRouter Embeddings API](https://openrouter.ai/docs/api/reference/embeddings)
+- [Core Package](https://github.com/phpaisdk/core)
