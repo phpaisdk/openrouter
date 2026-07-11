@@ -2,7 +2,6 @@
 
 declare(strict_types=1);
 
-use AiSdk\Capability;
 use AiSdk\Generate;
 use AiSdk\OpenRouter;
 use AiSdk\OpenRouter\Tests\Fakes\FakeHttpClient;
@@ -139,11 +138,10 @@ it('generates speech through the OpenRouter vertical', function () {
         ->and($client->lastRequest->getHeaderLine('Authorization'))->toBe('Bearer or-test');
 });
 
-it('loads routed model capabilities from resources models json', function () {
+it('accepts opaque routed model ids for every implemented modality', function () {
     OpenRouter::create(['apiKey' => 'or-test']);
 
-    expect(OpenRouter::model('anthropic/claude-sonnet-4')->supports(Capability::Reasoning))->toBeTrue()
-        ->and(OpenRouter::model('x-ai/grok-4.3')->supports(Capability::ImageInput))->toBeTrue()
-        ->and(OpenRouter::image('x-ai/grok-imagine-image-quality')->supports(Capability::ImageGeneration))->toBeTrue()
-        ->and(OpenRouter::speech('microsoft/mai-voice-2')->supports(Capability::SpeechGeneration))->toBeTrue();
+    expect(OpenRouter::model('vendor/future-text-model')->modelId())->toBe('vendor/future-text-model')
+        ->and(OpenRouter::image('vendor/future-image-model')->modelId())->toBe('vendor/future-image-model')
+        ->and(OpenRouter::speech('vendor/future-speech-model')->modelId())->toBe('vendor/future-speech-model');
 });

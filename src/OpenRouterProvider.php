@@ -23,16 +23,16 @@ final class OpenRouterProvider extends BaseProvider
 
     public function textModel(string $modelId): TextModelInterface
     {
-        return new OpenRouterTextModel($modelId, $this->options, $this->modelRegistry());
+        return new OpenRouterTextModel($modelId, $this->options);
     }
 
     public function imageModel(string $modelId): ImageModelInterface
     {
-        return new OpenRouterImageModel($modelId, $this->options, $this->modelRegistry());
+        return new OpenRouterImageModel($modelId, $this->options);
     }
 
     public function speechModel(string $modelId): SpeechModelInterface
     {
-        return new OpenRouterSpeechModel($modelId, $this->options, $this->modelRegistry());
+        return new OpenRouterSpeechModel($modelId, $this->options);
     }
 }

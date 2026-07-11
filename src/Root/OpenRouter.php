@@ -9,12 +9,9 @@ use AiSdk\Contracts\SpeechModelInterface;
 use AiSdk\Contracts\TextModelInterface;
 use AiSdk\OpenRouter\OpenRouterOptions;
 use AiSdk\OpenRouter\OpenRouterProvider;
-use AiSdk\Support\Concerns\RegistersModels;
 
 final class OpenRouter
 {
-    use RegistersModels;
-
     private static ?OpenRouterProvider $default = null;
 
     /**

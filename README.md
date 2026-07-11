@@ -23,6 +23,8 @@ $result = Generate::text()
 echo $result->text;
 ```
 
+Routed model IDs pass through unchanged and do not need to be registered. This package does not ship a model inventory; the SDK performs internal adapter validation before OpenRouter validates support for the selected route.
+
 ## Image Generation
 
 ```php
