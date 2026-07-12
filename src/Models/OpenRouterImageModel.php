@@ -6,6 +6,7 @@ namespace AiSdk\OpenRouter\Models;
 
 use AiSdk\Contracts\BaseModel;
 use AiSdk\Contracts\ImageModelInterface;
+use AiSdk\Exceptions\InvalidResponseException;
 use AiSdk\OpenAICompatible\ImageRequestBuilder;
 use AiSdk\OpenAICompatible\ImageResponseParser;
 use AiSdk\OpenRouter\OpenRouterOptions;
@@ -47,6 +48,38 @@ final class OpenRouterImageModel extends BaseModel implements ImageModelInterfac
         $payload = $this->runner($this->options->sdk)
             ->postJson($url, $body, $this->options->authHeaders(), $this->provider());
 
+        $this->ensureValidImageData($payload);
+
         return ImageResponseParser::parse($payload, $this->provider());
+    }
+
+    /**
+     * @param  array<string, mixed>  $payload
+     */
+    private function ensureValidImageData(array $payload): void
+    {
+        $images = $payload['data'] ?? null;
+        if (! is_array($images)) {
+            return;
+        }
+
+        foreach ($images as $image) {
+            $base64 = is_array($image) ? $image['b64_json'] ?? null : null;
+            $url = is_array($image) ? $image['url'] ?? null : null;
+
+            if (is_string($base64) && $base64 !== '' && base64_decode($base64, true) !== false) {
+                continue;
+            }
+
+            if (is_string($url) && filter_var($url, FILTER_VALIDATE_URL) !== false) {
+                continue;
+            }
+
+            throw InvalidResponseException::forProvider(
+                $this->provider(),
+                "Provider [{$this->provider()}] returned invalid image data.",
+                ['body' => $payload],
+            );
+        }
     }
 }

@@ -2,6 +2,13 @@
 
 declare(strict_types=1);
 
+use AiSdk\Contracts\EmbeddingProviderInterface;
+use AiSdk\Contracts\ImageProviderInterface;
+use AiSdk\Contracts\SpeechProviderInterface;
+use AiSdk\Contracts\TextProviderInterface;
+use AiSdk\Contracts\VideoProviderInterface;
+use AiSdk\Exceptions\InvalidArgumentException;
+use AiSdk\Exceptions\InvalidResponseException;
 use AiSdk\Generate;
 use AiSdk\OpenRouter;
 use AiSdk\OpenRouter\Tests\Fakes\FakeHttpClient;
@@ -167,3 +174,83 @@ it('accepts opaque routed model ids for every implemented modality', function ()
         ->and(OpenRouter::speech('vendor/future-speech-model')->modelId())->toBe('vendor/future-speech-model')
         ->and(OpenRouter::embedding('vendor/future-embedding-model')->modelId())->toBe('vendor/future-embedding-model');
 });
+
+it('declares contracts for every implemented modality', function () {
+    $provider = OpenRouter::create(['apiKey' => 'or-test']);
+
+    expect($provider)->toBeInstanceOf(TextProviderInterface::class)
+        ->and($provider)->toBeInstanceOf(ImageProviderInterface::class)
+        ->and($provider)->toBeInstanceOf(SpeechProviderInterface::class)
+        ->and($provider)->toBeInstanceOf(EmbeddingProviderInterface::class)
+        ->and($provider)->toBeInstanceOf(VideoProviderInterface::class);
+});
+
+it('rejects an empty OpenRouter image response', function () {
+    configureOpenRouterWith(new FakeHttpClient(200, json_encode([])));
+    OpenRouter::create(['apiKey' => 'or-test']);
+
+    Generate::image('A red cube')
+        ->model(OpenRouter::image('openai/gpt-image-1'))
+        ->run();
+})->throws(InvalidResponseException::class, 'no generated images');
+
+it('rejects OpenRouter image entries without valid image data', function () {
+    configureOpenRouterWith(new FakeHttpClient(200, json_encode([
+        'data' => [['b64_json' => 'not-base64', 'url' => 'not-a-url']],
+    ])));
+    OpenRouter::create(['apiKey' => 'or-test']);
+
+    Generate::image('A red cube')
+        ->model(OpenRouter::image('openai/gpt-image-1'))
+        ->run();
+})->throws(InvalidResponseException::class, 'invalid image data');
+
+it('rejects an empty OpenRouter speech response', function () {
+    configureOpenRouterWith(new FakeHttpClient(200, '', 'audio/mpeg'));
+    OpenRouter::create(['apiKey' => 'or-test']);
+
+    Generate::speech('Read this aloud.')
+        ->model(OpenRouter::speech('openai/gpt-4o-mini-tts'))
+        ->run();
+})->throws(InvalidResponseException::class, 'empty speech response');
+
+it('rejects JSON responses from the OpenRouter speech endpoint', function () {
+    configureOpenRouterWith(new FakeHttpClient(200, json_encode(['error' => ['message' => 'Unexpected success payload']])));
+    OpenRouter::create(['apiKey' => 'or-test']);
+
+    Generate::speech('Read this aloud.')
+        ->model(OpenRouter::speech('openai/gpt-4o-mini-tts'))
+        ->run();
+})->throws(InvalidResponseException::class, 'non-audio speech response');
+
+it('defaults OpenRouter speech requests to pcm', function () {
+    $client = new FakeHttpClient(200, 'audio-bytes', 'audio/pcm');
+    configureOpenRouterWith($client);
+    OpenRouter::create(['apiKey' => 'or-test']);
+
+    Generate::speech('Read this aloud.')
+        ->model(OpenRouter::speech('openai/gpt-4o-mini-tts'))
+        ->run();
+
+    expect($client->sentBody()['response_format'])->toBe('pcm')
+        ->and($client->lastRequest?->getHeaderLine('Accept'))->toBe('audio/pcm');
+});
+
+it('rejects undocumented OpenRouter speech formats', function () {
+    configureOpenRouterWith(new FakeHttpClient(200, 'audio-bytes', 'audio/pcm'));
+    OpenRouter::create(['apiKey' => 'or-test']);
+
+    Generate::speech('Read this aloud.')
+        ->model(OpenRouter::speech('openai/gpt-4o-mini-tts'))
+        ->format('wav')
+        ->run();
+})->throws(InvalidArgumentException::class, 'only supports mp3 and pcm');
+
+it('rejects an empty OpenRouter embedding response', function () {
+    configureOpenRouterWith(new FakeHttpClient(200, json_encode([])));
+    OpenRouter::create(['apiKey' => 'or-test']);
+
+    Generate::embedding('A document')
+        ->model(OpenRouter::embedding('openai/text-embedding-3-small'))
+        ->run();
+})->throws(InvalidResponseException::class, 'no valid embeddings');

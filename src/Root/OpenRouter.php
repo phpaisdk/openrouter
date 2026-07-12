@@ -8,6 +8,7 @@ use AiSdk\Contracts\EmbeddingModelInterface;
 use AiSdk\Contracts\ImageModelInterface;
 use AiSdk\Contracts\SpeechModelInterface;
 use AiSdk\Contracts\TextModelInterface;
+use AiSdk\Contracts\VideoModelInterface;
 use AiSdk\OpenRouter\OpenRouterOptions;
 use AiSdk\OpenRouter\OpenRouterProvider;
 
@@ -51,5 +52,10 @@ final class OpenRouter
     public static function embedding(string $modelId): EmbeddingModelInterface
     {
         return self::default()->embeddingModel($modelId);
+    }
+
+    public static function video(string $modelId): VideoModelInterface
+    {
+        return self::default()->videoModel($modelId);
     }
 }

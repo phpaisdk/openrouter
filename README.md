@@ -75,6 +75,16 @@ $result->output->save(__DIR__.'/speech.mp3');
 
 ## Configuration
 
+## Video Generation
+
+```php
+$result = Generate::video('A time-lapse of a flower blooming')
+    ->model(OpenRouter::video('google/veo-3.1'))
+    ->resolution('1080p')
+    ->aspectRatio('16:9')
+    ->run(timeout: 600);
+```
+
 | Variable | Description | Default |
 |---|---|---|
 | `OPENROUTER_API_KEY` | API key for authentication | Required |
