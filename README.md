@@ -73,6 +73,20 @@ $result = Generate::speech()
 $result->output->save(__DIR__.'/speech.mp3');
 ```
 
+## Transcription
+
+```php
+use AiSdk\Content;
+use AiSdk\Generate;
+use AiSdk\OpenRouter;
+
+$result = Generate::transcription(Content::audio(__DIR__.'/meeting.mp3'))
+    ->model(OpenRouter::transcription('openai/whisper-large-v3'))
+    ->run();
+
+echo $result->output->text;
+```
+
 ## Configuration
 
 ## Video Generation
@@ -132,4 +146,5 @@ composer test
 ## Links
 
 - [OpenRouter Embeddings API](https://openrouter.ai/docs/api/reference/embeddings)
+- [OpenRouter Speech-to-Text Guide](https://openrouter.ai/docs/guides/overview/multimodal/stt)
 - [Core Package](https://github.com/phpaisdk/core)

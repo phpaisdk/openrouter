@@ -13,15 +13,18 @@ use AiSdk\Contracts\SpeechModelInterface;
 use AiSdk\Contracts\SpeechProviderInterface;
 use AiSdk\Contracts\TextModelInterface;
 use AiSdk\Contracts\TextProviderInterface;
+use AiSdk\Contracts\TranscriptionModelInterface;
+use AiSdk\Contracts\TranscriptionProviderInterface;
 use AiSdk\Contracts\VideoModelInterface;
 use AiSdk\Contracts\VideoProviderInterface;
 use AiSdk\OpenRouter\Models\OpenRouterEmbeddingModel;
 use AiSdk\OpenRouter\Models\OpenRouterImageModel;
 use AiSdk\OpenRouter\Models\OpenRouterSpeechModel;
 use AiSdk\OpenRouter\Models\OpenRouterTextModel;
+use AiSdk\OpenRouter\Models\OpenRouterTranscriptionModel;
 use AiSdk\OpenRouter\Models\OpenRouterVideoModel;
 
-final class OpenRouterProvider extends BaseProvider implements EmbeddingProviderInterface, ImageProviderInterface, SpeechProviderInterface, TextProviderInterface, VideoProviderInterface
+final class OpenRouterProvider extends BaseProvider implements EmbeddingProviderInterface, ImageProviderInterface, SpeechProviderInterface, TextProviderInterface, TranscriptionProviderInterface, VideoProviderInterface
 {
     public function __construct(public readonly OpenRouterOptions $options) {}
 
@@ -43,6 +46,11 @@ final class OpenRouterProvider extends BaseProvider implements EmbeddingProvider
     public function speechModel(string $modelId): SpeechModelInterface
     {
         return new OpenRouterSpeechModel($modelId, $this->options);
+    }
+
+    public function transcriptionModel(string $modelId): TranscriptionModelInterface
+    {
+        return new OpenRouterTranscriptionModel($modelId, $this->options);
     }
 
     public function embeddingModel(string $modelId): EmbeddingModelInterface
