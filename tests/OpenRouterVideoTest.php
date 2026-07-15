@@ -1,10 +1,12 @@
 <?php
 
 declare(strict_types=1);
+
+use AiSdk\Generate;
+use AiSdk\OpenRouter;
 use AiSdk\OpenRouter\Models\OpenRouterVideoModel;
 use AiSdk\OpenRouter\OpenRouterOptions;
 use AiSdk\OpenRouter\Tests\Fakes\FakeHttpClient;
-use AiSdk\Requests\VideoRequest;
 use AiSdk\Responses\VideoJob;
 use AiSdk\Responses\VideoJobStatus;
 use AiSdk\Support\Sdk;
@@ -18,8 +20,16 @@ function openRouterVideoOptions(FakeHttpClient $c): OpenRouterOptions
 }
 it('starts OpenRouter video jobs', function () {
     $c = new FakeHttpClient(202, json_encode(['id' => 'job-1', 'polling_url' => 'https://openrouter.ai/api/v1/videos/job-1', 'status' => 'pending']));
-    $m = new OpenRouterVideoModel('google/veo-3.1', openRouterVideoOptions($c));
-    $j = $m->generate(new VideoRequest('Flower'));
+    $f = new Psr17Factory;
+    OpenRouter::create([
+        'apiKey' => 'key',
+        'sdk' => new Sdk($c, $f, $f),
+    ]);
+
+    $j = Generate::video('Flower')
+        ->model(OpenRouter::model('google/veo-3.1'))
+        ->job();
+
     expect($j->id)->toBe('job-1')->and($c->lastRequest?->getUri()->getPath())->toBe('/api/v1/videos');
 });
 it('polls completed OpenRouter video jobs', function () {

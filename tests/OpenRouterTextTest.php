@@ -90,7 +90,7 @@ it('generates images through the OpenRouter vertical', function () {
     OpenRouter::create(['apiKey' => 'or-test']);
 
     $result = Generate::image()
-        ->model(OpenRouter::image('recraft/recraft-v4.1-vector'))
+        ->model(OpenRouter::model('recraft/recraft-v4.1-vector'))
         ->prompt('A vector bird')
         ->count(1)
         ->aspectRatio('1:1')
@@ -120,7 +120,7 @@ it('generates speech through the OpenRouter vertical', function () {
     OpenRouter::create(['apiKey' => 'or-test']);
 
     $result = Generate::speech()
-        ->model(OpenRouter::speech('microsoft/mai-voice-2'))
+        ->model(OpenRouter::model('microsoft/mai-voice-2'))
         ->input('Welcome to the release.')
         ->voice('en-US-Harper:MAI-Voice-2')
         ->format('pcm')
@@ -156,7 +156,7 @@ it('generates embeddings through the OpenRouter vertical', function () {
     OpenRouter::create(['apiKey' => 'or-test']);
 
     $result = Generate::embedding('A document')
-        ->model(OpenRouter::embedding('openai/text-embedding-3-small'))
+        ->model(OpenRouter::model('openai/text-embedding-3-small'))
         ->dimensions(256)
         ->run();
 
@@ -170,9 +170,9 @@ it('accepts opaque routed model ids for every implemented modality', function ()
     OpenRouter::create(['apiKey' => 'or-test']);
 
     expect(OpenRouter::model('vendor/future-text-model')->modelId())->toBe('vendor/future-text-model')
-        ->and(OpenRouter::image('vendor/future-image-model')->modelId())->toBe('vendor/future-image-model')
-        ->and(OpenRouter::speech('vendor/future-speech-model')->modelId())->toBe('vendor/future-speech-model')
-        ->and(OpenRouter::embedding('vendor/future-embedding-model')->modelId())->toBe('vendor/future-embedding-model');
+        ->and(OpenRouter::model('vendor/future-image-model')->modelId())->toBe('vendor/future-image-model')
+        ->and(OpenRouter::model('vendor/future-speech-model')->modelId())->toBe('vendor/future-speech-model')
+        ->and(OpenRouter::model('vendor/future-embedding-model')->modelId())->toBe('vendor/future-embedding-model');
 });
 
 it('declares contracts for every implemented modality', function () {
@@ -190,7 +190,7 @@ it('rejects an empty OpenRouter image response', function () {
     OpenRouter::create(['apiKey' => 'or-test']);
 
     Generate::image('A red cube')
-        ->model(OpenRouter::image('openai/gpt-image-1'))
+        ->model(OpenRouter::model('openai/gpt-image-1'))
         ->run();
 })->throws(InvalidResponseException::class, 'no generated images');
 
@@ -201,7 +201,7 @@ it('rejects OpenRouter image entries without valid image data', function () {
     OpenRouter::create(['apiKey' => 'or-test']);
 
     Generate::image('A red cube')
-        ->model(OpenRouter::image('openai/gpt-image-1'))
+        ->model(OpenRouter::model('openai/gpt-image-1'))
         ->run();
 })->throws(InvalidResponseException::class, 'invalid image data');
 
@@ -210,7 +210,7 @@ it('rejects an empty OpenRouter speech response', function () {
     OpenRouter::create(['apiKey' => 'or-test']);
 
     Generate::speech('Read this aloud.')
-        ->model(OpenRouter::speech('openai/gpt-4o-mini-tts'))
+        ->model(OpenRouter::model('openai/gpt-4o-mini-tts'))
         ->run();
 })->throws(InvalidResponseException::class, 'empty speech response');
 
@@ -219,7 +219,7 @@ it('rejects JSON responses from the OpenRouter speech endpoint', function () {
     OpenRouter::create(['apiKey' => 'or-test']);
 
     Generate::speech('Read this aloud.')
-        ->model(OpenRouter::speech('openai/gpt-4o-mini-tts'))
+        ->model(OpenRouter::model('openai/gpt-4o-mini-tts'))
         ->run();
 })->throws(InvalidResponseException::class, 'non-audio speech response');
 
@@ -229,7 +229,7 @@ it('defaults OpenRouter speech requests to pcm', function () {
     OpenRouter::create(['apiKey' => 'or-test']);
 
     Generate::speech('Read this aloud.')
-        ->model(OpenRouter::speech('openai/gpt-4o-mini-tts'))
+        ->model(OpenRouter::model('openai/gpt-4o-mini-tts'))
         ->run();
 
     expect($client->sentBody()['response_format'])->toBe('pcm')
@@ -241,7 +241,7 @@ it('rejects undocumented OpenRouter speech formats', function () {
     OpenRouter::create(['apiKey' => 'or-test']);
 
     Generate::speech('Read this aloud.')
-        ->model(OpenRouter::speech('openai/gpt-4o-mini-tts'))
+        ->model(OpenRouter::model('openai/gpt-4o-mini-tts'))
         ->format('wav')
         ->run();
 })->throws(InvalidArgumentException::class, 'only supports mp3 and pcm');
@@ -251,6 +251,6 @@ it('rejects an empty OpenRouter embedding response', function () {
     OpenRouter::create(['apiKey' => 'or-test']);
 
     Generate::embedding('A document')
-        ->model(OpenRouter::embedding('openai/text-embedding-3-small'))
+        ->model(OpenRouter::model('openai/text-embedding-3-small'))
         ->run();
 })->throws(InvalidResponseException::class, 'no valid embeddings');

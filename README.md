@@ -32,7 +32,7 @@ use AiSdk\Generate;
 use AiSdk\OpenRouter;
 
 $result = Generate::embedding(['Search query', 'Document text'])
-    ->model(OpenRouter::embedding('openai/text-embedding-3-small'))
+    ->model(OpenRouter::model('openai/text-embedding-3-small'))
     ->dimensions(256)
     ->run();
 
@@ -40,7 +40,7 @@ $queryVector = $result->embeddings[0]->vector;
 $documentVector = $result->embeddings[1]->vector;
 ```
 
-OpenRouter embedding model IDs pass through unchanged. The v0.5 portable embedding API accepts text or a list of texts; provider-specific multimodal embedding inputs are outside this contract.
+OpenRouter embedding model IDs pass through unchanged. The portable embedding API accepts text or a list of texts; provider-specific multimodal embedding inputs are outside this contract.
 
 ## Image Generation
 
@@ -49,7 +49,7 @@ use AiSdk\Generate;
 use AiSdk\OpenRouter;
 
 $result = Generate::image()
-    ->model(OpenRouter::image('openai/gpt-image-1'))
+    ->model(OpenRouter::model('openai/gpt-image-1'))
     ->prompt('A clean app icon for a PHP AI SDK')
     ->size('1024x1024')
     ->run();
@@ -64,7 +64,7 @@ use AiSdk\Generate;
 use AiSdk\OpenRouter;
 
 $result = Generate::speech()
-    ->model(OpenRouter::speech('microsoft/mai-voice-2'))
+    ->model(OpenRouter::model('microsoft/mai-voice-2'))
     ->input('Welcome to the release.')
     ->voice('en-US-Harper:MAI-Voice-2')
     ->format('mp3')
@@ -81,23 +81,23 @@ use AiSdk\Generate;
 use AiSdk\OpenRouter;
 
 $result = Generate::transcription(Content::audio(__DIR__.'/meeting.mp3'))
-    ->model(OpenRouter::transcription('openai/whisper-large-v3'))
+    ->model(OpenRouter::model('openai/whisper-large-v3'))
     ->run();
 
 echo $result->output->text;
 ```
 
-## Configuration
-
 ## Video Generation
 
 ```php
 $result = Generate::video('A time-lapse of a flower blooming')
-    ->model(OpenRouter::video('google/veo-3.1'))
+    ->model(OpenRouter::model('google/veo-3.1'))
     ->resolution('1080p')
     ->aspectRatio('16:9')
     ->run(timeout: 600);
 ```
+
+## Configuration
 
 | Variable | Description | Default |
 |---|---|---|
@@ -132,7 +132,7 @@ Embedding-specific fields use the same provider namespace. For example, models t
 
 ```php
 $result = Generate::embedding('Document text')
-    ->model(OpenRouter::embedding('provider/embedding-model'))
+    ->model(OpenRouter::model('provider/embedding-model'))
     ->providerOptions('openrouter', ['input_type' => 'search_document'])
     ->run();
 ```

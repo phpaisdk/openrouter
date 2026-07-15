@@ -24,7 +24,7 @@ it('uses OpenRouter native transcription endpoint', function () {
     expect(OpenRouter::default())->toBeInstanceOf(TranscriptionProviderInterface::class);
 
     $result = Generate::transcription(Content::audio('flac', 'audio/flac', 'clip.flac'))
-        ->model(OpenRouter::transcription('openai/whisper-large-v3'))
+        ->model(OpenRouter::model('openai/whisper-large-v3'))
         ->run();
 
     expect($result->output->text)->toBe('OpenRouter transcript.')

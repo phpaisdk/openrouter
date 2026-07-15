@@ -33,32 +33,32 @@ final class OpenRouterProvider extends BaseProvider implements EmbeddingProvider
         return OpenRouterOptions::PROVIDER_NAME;
     }
 
-    public function textModel(string $modelId): TextModelInterface
+    protected function textModel(string $modelId): TextModelInterface
     {
         return new OpenRouterTextModel($modelId, $this->options);
     }
 
-    public function imageModel(string $modelId): ImageModelInterface
+    protected function imageModel(string $modelId): ImageModelInterface
     {
         return new OpenRouterImageModel($modelId, $this->options);
     }
 
-    public function speechModel(string $modelId): SpeechModelInterface
+    protected function speechModel(string $modelId): SpeechModelInterface
     {
         return new OpenRouterSpeechModel($modelId, $this->options);
     }
 
-    public function transcriptionModel(string $modelId): TranscriptionModelInterface
+    protected function transcriptionModel(string $modelId): TranscriptionModelInterface
     {
         return new OpenRouterTranscriptionModel($modelId, $this->options);
     }
 
-    public function embeddingModel(string $modelId): EmbeddingModelInterface
+    protected function embeddingModel(string $modelId): EmbeddingModelInterface
     {
         return new OpenRouterEmbeddingModel($modelId, $this->options);
     }
 
-    public function videoModel(string $modelId): VideoModelInterface
+    protected function videoModel(string $modelId): VideoModelInterface
     {
         return new OpenRouterVideoModel($modelId, $this->options);
     }
