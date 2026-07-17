@@ -151,8 +151,13 @@ $result = Generate::embedding('Document text')
 composer test
 ```
 
-## Links
+## Documentation
 
-- [OpenRouter Embeddings API](https://openrouter.ai/docs/api/reference/embeddings)
-- [OpenRouter Speech-to-Text Guide](https://openrouter.ai/docs/guides/overview/multimodal/stt)
-- [Core Package](https://github.com/phpaisdk/core)
+- [PHP AI SDK documentation](https://phpaisdk.com/docs)
+- [OpenRouter documentation](https://phpaisdk.com/docs/openrouter)
+
+## Community
+
+- [Contributing](https://github.com/phpaisdk/.github/blob/main/CONTRIBUTING.md)
+- [Support](https://github.com/phpaisdk/.github/blob/main/SUPPORT.md)
+- For private security reports, email [security@phpaisdk.com](mailto:security@phpaisdk.com).
