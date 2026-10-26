@@ -57,6 +57,6 @@ final class OpenRouterOptions
      */
     public function authHeaders(): array
     {
-        return array_merge(['Authorization' => 'Bearer '.$this->apiKey], $this->headers);
+        return array_merge(['Authorization' => 'Bearer ' . $this->apiKey], $this->headers);
     }
 }

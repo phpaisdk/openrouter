@@ -17,7 +17,7 @@ afterEach(function () {
 
 it('uses OpenRouter native transcription endpoint', function () {
     $client = new FakeHttpClient(200, '{"text":"OpenRouter transcript.","usage":{"total_tokens":9}}');
-    $factory = new Psr17Factory;
+    $factory = new Psr17Factory();
     Generate::configure(new Sdk($client, $factory, $factory));
     OpenRouter::create(['apiKey' => 'or-test']);
 

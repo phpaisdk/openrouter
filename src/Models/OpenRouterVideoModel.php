@@ -38,7 +38,7 @@ final class OpenRouterVideoModel extends BaseModel implements VideoModelInterfac
             throw new InvalidArgumentException('OpenRouter video generation accepts image references, not a source video.');
         }
         $o = $r->providerOptionsFor($this->provider());
-        $body = array_filter(['model' => $this->modelId, 'prompt' => $r->prompt, 'duration' => $r->output?->duration, 'resolution' => $r->output?->resolution, 'aspect_ratio' => $r->output?->aspectRatio, 'seed' => $r->output?->seed], fn ($v) => $v !== null);
+        $body = array_filter(['model' => $this->modelId, 'prompt' => $r->prompt, 'duration' => $r->output?->duration, 'resolution' => $r->output?->resolution, 'aspect_ratio' => $r->output?->aspectRatio, 'seed' => $r->output?->seed], fn($v) => $v !== null);
         if ($r->image) {
             $body['frame_images'] = [['type' => 'image_url', 'image_url' => ['url' => $this->media($r->image)], 'frame_type' => 'first_frame']];
         }if (is_array($o['frameImages'] ?? null)) {
@@ -57,22 +57,22 @@ final class OpenRouterVideoModel extends BaseModel implements VideoModelInterfac
 
     public function poll(VideoJob $job): VideoJob
     {
-        $url = $job->providerMetadata[$this->provider()]['pollingUrl'] ?? Url::joinPath($this->options->baseUrl, '/videos/'.rawurlencode($job->id));
+        $url = $job->providerMetadata[$this->provider()]['pollingUrl'] ?? Url::joinPath($this->options->baseUrl, '/videos/' . rawurlencode($job->id));
         $p = $this->runner($this->options->sdk)->getJson((string) $url, $this->options->authHeaders(), $this->provider());
         $s = (string) ($p['status'] ?? 'pending');
         if ($s === 'completed') {
-            $url = $p['unsigned_urls'][0] ?? Url::joinPath($this->options->baseUrl, '/videos/'.rawurlencode($job->id).'/content?index=0');
+            $url = $p['unsigned_urls'][0] ?? Url::joinPath($this->options->baseUrl, '/videos/' . rawurlencode($job->id) . '/content?index=0');
 
             return new VideoJob($job->id, $job->provider, $job->modelId, VideoJobStatus::Succeeded, new VideoData(url: (string) $url), usage: Usage::empty(), rawResponse: $p, providerMetadata: $job->providerMetadata);
         } $status = match ($s) {
-            'failed' => VideoJobStatus::Failed,'cancelled' => VideoJobStatus::Canceled,'expired' => VideoJobStatus::Expired,default => VideoJobStatus::Running
+            'failed' => VideoJobStatus::Failed,'cancelled' => VideoJobStatus::Canceled,'expired' => VideoJobStatus::Expired,default => VideoJobStatus::Running,
         };
 
-        return new VideoJob($job->id, $job->provider, $job->modelId, $status, errorMessage: $status === VideoJobStatus::Running ? null : (string) ($p['error'] ?? 'OpenRouter video generation '.$s.'.'), rawResponse: $p, providerMetadata: $job->providerMetadata);
+        return new VideoJob($job->id, $job->provider, $job->modelId, $status, errorMessage: $status === VideoJobStatus::Running ? null : (string) ($p['error'] ?? 'OpenRouter video generation ' . $s . '.'), rawResponse: $p, providerMetadata: $job->providerMetadata);
     }
 
     private function media(Content $c): string
     {
-        return $c->source() === ContentSource::Url ? (string) $c->url() : 'data:'.$c->mimeType().';base64,'.$c->base64Data();
+        return $c->source() === ContentSource::Url ? (string) $c->url() : 'data:' . $c->mimeType() . ';base64,' . $c->base64Data();
     }
 }

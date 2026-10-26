@@ -14,13 +14,13 @@ use Nyholm\Psr7\Factory\Psr17Factory;
 
 function openRouterVideoOptions(FakeHttpClient $c): OpenRouterOptions
 {
-    $f = new Psr17Factory;
+    $f = new Psr17Factory();
 
     return new OpenRouterOptions('key', sdk: new Sdk($c, $f, $f));
 }
 it('starts OpenRouter video jobs', function () {
     $c = new FakeHttpClient(202, json_encode(['id' => 'job-1', 'polling_url' => 'https://openrouter.ai/api/v1/videos/job-1', 'status' => 'pending']));
-    $f = new Psr17Factory;
+    $f = new Psr17Factory();
     OpenRouter::create([
         'apiKey' => 'key',
         'sdk' => new Sdk($c, $f, $f),

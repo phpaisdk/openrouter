@@ -38,7 +38,7 @@ final class OpenRouterTranscriptionModel extends BaseModel implements Transcript
         $url = Url::joinPath($this->options->baseUrl, '/audio/transcriptions');
         $httpRequest = $sdk->requestFactory->createRequest('POST', $url)
             ->withBody($sdk->streamFactory->createStream($multipart['body']))
-            ->withHeader('Content-Type', 'multipart/form-data; boundary='.$multipart['boundary'])
+            ->withHeader('Content-Type', 'multipart/form-data; boundary=' . $multipart['boundary'])
             ->withHeader('Accept', 'application/json');
 
         foreach ($this->options->authHeaders() as $name => $value) {
