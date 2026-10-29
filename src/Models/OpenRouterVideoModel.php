@@ -58,7 +58,11 @@ final class OpenRouterVideoModel extends BaseModel implements VideoModelInterfac
     public function poll(VideoJob $job): VideoJob
     {
         $url = $job->providerMetadata[$this->provider()]['pollingUrl'] ?? Url::joinPath($this->options->baseUrl, '/videos/' . rawurlencode($job->id));
-        $p = $this->runner($this->options->sdk)->getJson((string) $url, $this->options->authHeaders(), $this->provider());
+        if (! is_string($url)) {
+            throw new InvalidResponseException('Provider follow-up URL has an untrusted origin.');
+        }
+        $this->assertFollowUpOrigin($url, $this->options->baseUrl);
+        $p = $this->runner($this->options->sdk)->getJson($url, $this->options->authHeaders(), $this->provider());
         $s = (string) ($p['status'] ?? 'pending');
         if ($s === 'completed') {
             $url = $p['unsigned_urls'][0] ?? Url::joinPath($this->options->baseUrl, '/videos/' . rawurlencode($job->id) . '/content?index=0');
@@ -69,6 +73,35 @@ final class OpenRouterVideoModel extends BaseModel implements VideoModelInterfac
         };
 
         return new VideoJob($job->id, $job->provider, $job->modelId, $status, errorMessage: $status === VideoJobStatus::Running ? null : (string) ($p['error'] ?? 'OpenRouter video generation ' . $s . '.'), rawResponse: $p, providerMetadata: $job->providerMetadata);
+    }
+
+    // OpenRouter documents polling on its API origin:
+    // https://openrouter.ai/docs/guides/overview/multimodal/video-generation
+    private function assertFollowUpOrigin(string $url, string $baseUrl): void
+    {
+        $origin = static function (string $value): ?string {
+            if (preg_match('/[\x00-\x20\x7f\\\\]/', $value) === 1) {
+                return null;
+            }
+            $parts = parse_url($value);
+            if ($parts === false || ! isset($parts['scheme'], $parts['host'])
+                || isset($parts['user']) || isset($parts['pass'])) {
+                return null;
+            }
+            $scheme = strtolower($parts['scheme']);
+            if (! in_array($scheme, ['http', 'https'], true) || ($parts['port'] ?? 1) < 1) {
+                return null;
+            }
+
+            return $scheme . '://' . strtolower($parts['host']) . ':' . ($parts['port'] ?? ($scheme === 'https' ? 443 : 80));
+        };
+        $actual = $origin($url);
+        $expected = $origin($baseUrl);
+        if ($actual !== null && $expected !== null && $actual === $expected) {
+            return;
+        }
+
+        throw new InvalidResponseException('Provider follow-up URL has an untrusted origin.');
     }
 
     private function media(Content $c): string
