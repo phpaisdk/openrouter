@@ -2,7 +2,7 @@
 
 Notable changes to `aisdk/openrouter`. Release notes are also published at https://github.com/phpaisdk/openrouter/releases.
 
-## Unreleased (v0.10.2)
+## v0.10.2 — 2026-10-29
 
 - Reject untrusted video polling origins before sending API credentials.
 - Requires `aisdk/core ^0.10.2` at release.
