@@ -2,7 +2,7 @@
 
 Notable changes to `aisdk/openrouter`. Release notes are also published at https://github.com/phpaisdk/openrouter/releases.
 
-## Unreleased (v0.11.0)
+## v0.11.0 — 2026-10-31
 
 - Requires `aisdk/core ^0.11.0` for shared follow-up URL origin validation.
 
