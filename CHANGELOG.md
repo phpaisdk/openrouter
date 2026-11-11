@@ -2,6 +2,10 @@
 
 Notable changes to `aisdk/openrouter`. Release notes are also published at https://github.com/phpaisdk/openrouter/releases.
 
+## v0.11.1 — 2026-11-11
+
+- The `aisdk/openrouter` test suite now supports Pest 3, 4, and 5; Pest 5 requires PHP 8.4.
+
 ## v0.11.0 — 2026-10-31
 
 - Requires `aisdk/core ^0.11.0` for shared follow-up URL origin validation.
